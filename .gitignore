@@ -1,3 +1,7 @@
+# Custom
+assets/build_files/
+build
+
 # Logs
 logs
 *.log

@@ -1,0 +1,39 @@
+{
+  "name": "gmtk_gamejam_2022",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build-dev": "webpack --config webpack/webpack.common.js",
+    "export-levels": "node scripts/export_levels.js",
+    "export-sprites": "node scripts/export_sprites.js",
+    "eslint": "npx eslint source/** --fix",
+	"build-full": "npm run export-levels && npm run export-sprites && webpack --config webpack/webpack.common.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElroyDolleman/GMTK_GameJam_2022.git"
+  },
+  "author": "Elroy Dolleman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElroyDolleman/GMTK_GameJam_2022/issues"
+  },
+  "homepage": "https://github.com/ElroyDolleman/GMTK_GameJam_2022#readme",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "copy-webpack-plugin": "^11.0.0",
+    "eslint": "^8.19.0",
+    "free-tex-packer-core": "^0.3.4",
+    "node-cmd": "^5.0.0",
+    "phaser": "^3.55.2",
+    "ts-loader": "^9.3.1",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
+    "typescript": "^4.7.4"
+  }
+}
