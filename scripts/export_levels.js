@@ -2,37 +2,45 @@ const fs = require('fs');
 
 const levelsPath = './ogmo/';
 
-function getLevelsJson()
+let addChunk = file =>
 {
-	let outputJson = {};
-
 	return new Promise((resolve, reject) =>
 	{
-		fs.readdir(levelsPath, (err, files) =>
+		fs.readFile(levelsPath + file, 'utf8', (err, data) =>
+		{
+			if (err) {
+				reject(err);
+			}
+			else {
+				resolve(JSON.parse(data));
+			}
+		});
+	});
+}
+
+let getLevelsJson = async() =>
+{
+	return new Promise(async(resolve, reject) =>
+	{
+		fs.readdir(levelsPath, async(err, files) =>
 		{
 			if (err) {
 				console.error(err);
 				process.exit(1);
 			}
 
+			let outputJson = {};
 			files = files.filter(file => { return file.includes(".json") });
 		
-			files.forEach((file, index) =>
+			for (let i = 0; i < files.length; i++)
 			{
-				fs.readFile(levelsPath + file, 'utf8', (err, data) =>
-				{
-					if (err) {
-						console.error(err);
-						return;
-					}
+				let chunkJson = await addChunk(files[i]);
+				outputJson[files[i].split('.json')[0]] = chunkJson;
 
-					let levelJson = JSON.parse(data);
-					outputJson[file.split('.json')[0]] = levelJson;
-					resolve(outputJson);
-
-					console.log('\x1b[33m%s\x1b[0m', file);
-				});
-			});
+				console.log('\x1b[33m%s\x1b[0m', files[i]);
+			}
+	
+			resolve(outputJson);
 		});
 	});
 }

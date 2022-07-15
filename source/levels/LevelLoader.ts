@@ -4,11 +4,16 @@ import { EntityLayerData, ChunkData, TileLayerData } from './LevelData';
 import { Tile } from './tile';
 
 type LevelsJson = { [key: string]: ChunkData; };
+type ChunkType = 'deadend' | 'corridor' | 'up_corner' | 'down_corner';
+type ChunkNames = { [key in ChunkType]: string[]; };
 
 export class LevelLoader
 {
 	public readonly scene: Phaser.Scene;
+
 	private _jsonData: LevelsJson;
+
+	private _chunkNames: ChunkNames = {} as ChunkNames;
 
 	public constructor(scene: Phaser.Scene)
 	{
@@ -26,6 +31,14 @@ export class LevelLoader
 		if (this.scene.cache.json.has('levels'))
 		{
 			this._jsonData = this.scene.cache.json.get('levels');
+
+			let allChunks: string[] = [];
+			Object.keys(this._jsonData).forEach(chunkName => allChunks.push(chunkName));
+
+			this._chunkNames['deadend'] = allChunks.filter(name => name.includes('chunk_deadend'));
+			this._chunkNames['corridor'] = allChunks.filter(name => name.includes('chunk_corridor'));
+			this._chunkNames['up_corner'] = allChunks.filter(name => name.includes('chunk_upcorner'));
+			this._chunkNames['down_corner'] = allChunks.filter(name => name.includes('chunk_downcorner'));
 		}
 		else
 		{
@@ -51,14 +64,40 @@ export class LevelLoader
 		{
 			for (let y = 0; y < chunksY; y++)
 			{
-				this.loadChunk('playground', { x, y });
+				let type = this._getChunkTypeByPosition(x, y, chunksX - 1, chunksY - 1);
+				this.loadChunk(this._pickChunk(type), { x, y });
 			}
 		}
 	}
 
-	public loadChunk(chunkName: string, chunkPos: IPoint): void
+	private _getChunkTypeByPosition(x: number, y: number, lastX: number, lastY: number): ChunkType
 	{
-		const chunkData = this._getChunkData(chunkName);
+		if (x === 0)
+		{
+			if (y === 0) { return 'deadend'; }
+			if (y % 2 === 0) { return 'up_corner'; }
+			if (y === lastY) { return 'deadend'; }
+			return 'down_corner';
+		}
+		if (x === lastX)
+		{
+			if (y === 0) { return 'down_corner'; }
+			if (y % 2 !== 0) { return 'up_corner'; }
+			if (y === lastY) { return 'deadend'; }
+			return 'up_corner';
+		}
+		return 'corridor';
+	}
+
+	private _pickChunk(type: ChunkType): ChunkData
+	{
+		let index = Phaser.Math.Between(0, this._chunkNames[type].length - 1);
+
+		return this._getChunkData(this._chunkNames[type][index]);
+	}
+
+	public loadChunk(chunkData: ChunkData, chunkPos: IPoint): void
+	{
 		chunkData.layers.forEach(layer =>
 		{
 			switch(layer.name)
