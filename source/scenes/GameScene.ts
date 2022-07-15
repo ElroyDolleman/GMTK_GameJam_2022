@@ -1,8 +1,15 @@
+
+import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 import { LevelLoader } from '../levels/LevelLoader';
 
 export class GameScene extends Phaser.Scene
 {
 	private readonly _levelLoader: LevelLoader;
+
+	private camKeyLeft: Phaser.Input.Keyboard.Key;
+	private camKeyRight: Phaser.Input.Keyboard.Key;
+	private camKeyUp: Phaser.Input.Keyboard.Key;
+	private camKeyDown: Phaser.Input.Keyboard.Key;
 
 	public constructor()
 	{
@@ -20,8 +27,10 @@ export class GameScene extends Phaser.Scene
 
 	public create(): void
 	{
-		this.cameras.main.setBounds(0, 0, 3392, 1000);
-		this.cameras.main.setScroll(34, 40);
+		this.camKeyLeft = this.input.keyboard.addKey('left');
+		this.camKeyRight = this.input.keyboard.addKey('right');
+		this.camKeyUp = this.input.keyboard.addKey('up');
+		this.camKeyDown = this.input.keyboard.addKey('down');
 
 		this._levelLoader.generateLevel(2, 2);
 
@@ -39,6 +48,21 @@ export class GameScene extends Phaser.Scene
 
 	public update(): void
 	{
-
+		if (this.camKeyLeft.isDown)
+		{
+			this.cameras.main.setScroll(this.cameras.main.scrollX - 4, this.cameras.main.scrollY);
+		}
+		else if (this.camKeyRight.isDown)
+		{
+			this.cameras.main.setScroll(this.cameras.main.scrollX + 4, this.cameras.main.scrollY);
+		}
+		if (this.camKeyUp.isDown)
+		{
+			this.cameras.main.setScroll(this.cameras.main.scrollX, this.cameras.main.scrollY - 4);
+		}
+		else if (this.camKeyDown.isDown)
+		{
+			this.cameras.main.setScroll(this.cameras.main.scrollX, this.cameras.main.scrollY + 4);
+		}
 	}
 }

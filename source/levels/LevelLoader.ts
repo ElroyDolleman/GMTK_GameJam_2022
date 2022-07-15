@@ -1,4 +1,4 @@
-import { CHUNKS_Y, CHUNKS_X, TILE_HEIGHT, TILE_WIDTH } from '../app';
+import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 import { IPoint } from '../utilities/IPoint';
 import { EntityLayerData, ChunkData, TileLayerData } from './LevelData';
 import { Tile } from './tile';
@@ -41,6 +41,12 @@ export class LevelLoader
 			this.initJson();
 		}
 
+		this.scene.cameras.main.setBounds(
+			0, 0,
+			CHUNK_ROWS * TILE_WIDTH * chunksX,
+			CHUNKS_COLUMNS * TILE_HEIGHT * chunksY
+		);
+
 		for (let x = 0; x < chunksX; x++)
 		{
 			for (let y = 0; y < chunksY; y++)
@@ -61,8 +67,8 @@ export class LevelLoader
 				this._setupTileLayer(
 					layer as TileLayerData,
 					{
-						x: chunkPos.x * CHUNKS_X,
-						y: chunkPos.y * CHUNKS_Y
+						x: chunkPos.x * CHUNK_ROWS,
+						y: chunkPos.y * CHUNKS_COLUMNS
 					}
 				);
 				break;
