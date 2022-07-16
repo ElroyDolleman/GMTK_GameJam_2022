@@ -64,29 +64,29 @@ export class LevelLoader
 		{
 			for (let y = 0; y < chunksY; y++)
 			{
-				let type = this._getChunkTypeByPosition(x, y, chunksX - 1, chunksY - 1);
-				this.loadChunk(this._pickChunk(type), { x, y });
+				let info = this._getChunkInfoByPosition(x, y, chunksX - 1, chunksY - 1);
+				this.loadChunk(this._pickChunk(info.type), { x, y }, info.reverse);
 			}
 		}
 	}
 
-	private _getChunkTypeByPosition(x: number, y: number, lastX: number, lastY: number): ChunkType
+	private _getChunkInfoByPosition(x: number, y: number, lastX: number, lastY: number): { type: ChunkType, reverse: boolean }
 	{
 		if (x === 0)
 		{
-			if (y === 0) { return 'deadend'; }
-			if (y % 2 === 0) { return 'up_corner'; }
-			if (y === lastY) { return 'deadend'; }
-			return 'down_corner';
+			if (y === 0) { return { type: 'deadend', reverse: false } }
+			if (y % 2 === 0) { return { type: 'up_corner', reverse: false } }
+			if (y === lastY) { return { type: 'deadend', reverse: false } }
+			return { type: 'down_corner', reverse: false }
 		}
 		if (x === lastX)
 		{
-			if (y === 0) { return 'down_corner'; }
-			if (y % 2 !== 0) { return 'up_corner'; }
-			if (y === lastY) { return 'deadend'; }
-			return 'up_corner';
+			if (y === 0) { return { type: 'down_corner', reverse: true } }
+			if (y % 2 !== 0) { return { type: 'up_corner', reverse: true } }
+			if (y === lastY) { return { type: 'deadend', reverse: true } }
+			return { type: 'up_corner', reverse: true }
 		}
-		return 'corridor';
+		return { type: 'corridor', reverse: false }
 	}
 
 	private _pickChunk(type: ChunkType): ChunkData
@@ -96,7 +96,7 @@ export class LevelLoader
 		return this._getChunkData(this._chunkNames[type][index]);
 	}
 
-	public loadChunk(chunkData: ChunkData, chunkPos: IPoint): void
+	public loadChunk(chunkData: ChunkData, chunkPos: IPoint, reverse: boolean): void
 	{
 		chunkData.layers.forEach(layer =>
 		{
@@ -108,7 +108,8 @@ export class LevelLoader
 					{
 						x: chunkPos.x * CHUNK_ROWS,
 						y: chunkPos.y * CHUNKS_COLUMNS
-					}
+					},
+					reverse
 				);
 				break;
 			case 'entity_layer':
@@ -118,15 +119,22 @@ export class LevelLoader
 		});
 	}
 
-	private _setupTileLayer(layerData: TileLayerData, offset: IPoint): void
+	private _setupTileLayer(layerData: TileLayerData, offset: IPoint, reverse: boolean): void
 	{
 		const tiles: Tile[] = [];
 
 		for (let y = 0; y < layerData.data2D.length; y++)
 		{
-			for (let x = 0; x < layerData.data2D[y].length; x++)
+			let rows = layerData.data2D[y];
+			if (reverse)
 			{
-				const tileNum = layerData.data2D[y][x];
+				rows = layerData.data2D[y].concat().reverse();
+			}
+
+			// for (let x = startX; x != endX; x += increment)
+			for (let x = 0; x < rows.length; x++)
+			{
+				const tileNum = rows[x];
 				let sprite: Phaser.GameObjects.Sprite | undefined;
 
 				const cellX = offset.x + x;
@@ -138,7 +146,8 @@ export class LevelLoader
 						tileNum,
 						cellX * TILE_WIDTH,
 						cellY * TILE_HEIGHT,
-						'main_tileset'
+						'main_tileset',
+						reverse
 					);
 				}
 
@@ -155,10 +164,11 @@ export class LevelLoader
 		});
 	}
 
-	private _makeSprite(tileId: number, posX: number, posY: number, tilesetName: string): Phaser.GameObjects.Sprite
+	private _makeSprite(tileId: number, posX: number, posY: number, tilesetName: string, flipX: boolean): Phaser.GameObjects.Sprite
 	{
 		const sprite = this.scene.add.sprite(posX + TILE_WIDTH / 2, posY + TILE_WIDTH / 2, tilesetName, tileId);
 		sprite.setOrigin(0.5, 0.5);
+		sprite.flipX = flipX;
 		return sprite;
 	}
 

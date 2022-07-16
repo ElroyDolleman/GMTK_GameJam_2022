@@ -32,7 +32,7 @@ export class GameScene extends Phaser.Scene
 		this.camKeyUp = this.input.keyboard.addKey('up');
 		this.camKeyDown = this.input.keyboard.addKey('down');
 
-		this._levelLoader.generateLevel(2, 2);
+		this._levelLoader.generateLevel(3, 3);
 
 		// const atlasTexture = this.textures.get('test');
 		// const frames = atlasTexture.getFrameNames();
