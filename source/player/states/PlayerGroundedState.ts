@@ -36,6 +36,12 @@ export class PlayerGroundedState implements IBaseState<Player>
 		{
 			this.machine.changeState(PlayerStates.Fall);
 		}
+
+		if ((result.collided.onRight && this.machine.owner.speed.x > 0) ||
+		(result.collided.onLeft && this.machine.owner.speed.x < 0))
+		{
+			this.machine.owner.speed.x = 0;
+		}
 	}
 
 	protected _hasGroundUnderneath(tiles: Tile[]): boolean

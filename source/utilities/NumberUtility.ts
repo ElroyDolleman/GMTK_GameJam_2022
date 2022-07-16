@@ -1,6 +1,7 @@
 export class NumberUtility
 {
 	private constructor() {}
+
 	/**
 	 * Returns an integer that indicates the sign of a number.
 	 */

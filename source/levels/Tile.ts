@@ -34,8 +34,8 @@ export class Tile
 
 		if (this.sprite)
 		{
-			this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFF0000, alpha: 0.4 } });
-			this._debugGraphics.fillRectShape(this.hitbox);
+			// this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFF0000, alpha: 0.4 } });
+			// this._debugGraphics.fillRectShape(this.hitbox);
 
 			if (!tileType)
 			{

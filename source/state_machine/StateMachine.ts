@@ -42,9 +42,9 @@ export class StateMachine<T>
 		this.onStateChanged.emit('state-changed', key);
 	}
 
-	public addStateChangedListener(event: () => void, context?: any): void
+	public addStateChangedListener(event: (state: number) => void, scope?: any): void
 	{
-		this.onStateChanged.addListener('state-changed', event, context);
+		this.onStateChanged.addListener('state-changed', event, scope);
 	}
 
 	public destroy(): void

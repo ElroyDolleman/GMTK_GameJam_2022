@@ -19,7 +19,13 @@ export class SpriteAnimator
 	public readonly sprite: Phaser.GameObjects.Sprite;
 	public readonly scene: Phaser.Scene;
 
-	private _currentSquish: SquishProps;
+	private _currentSquish: SquishProps = {
+		timer: 0,
+		reverseTime: 0,
+		startTime: 0,
+		scaleX: 1,
+		scaleY: 1
+	};
 	private _currentAnimKey: string = '';
 
 	public constructor(scene: Phaser.Scene, sprite: Phaser.GameObjects.Sprite)
@@ -46,17 +52,24 @@ export class SpriteAnimator
 		}
 		else
 		{
-			this.sprite.play(key);
+			this.sprite.anims.play(key);
 		}
 	}
-	public createAnimation(key: string, texture: string, prefix: string, length: number, frameRate: number = 16, repeat: number = -1): void
+
+	public createAnimation(key: string, texture: string, prefix: string, end: number, frameRate: number = 16, repeat: number = -1): void
 	{
 		let frameNames = this.scene.anims.generateFrameNames(texture, {
-			prefix: prefix,
-			suffix: '.png',
-			end: length - 1,
-			zeroPad: 2
+			prefix,
+			start: 1,
+			end,
 		});
+
+		if (frameNames.length === 0)
+		{
+			console.log(key, texture, prefix, end);
+			throw new Error('Failed to generate frame names for animation.');
+		}
+
 		this.scene.anims.create({
 			key: key,
 			frames: frameNames,
