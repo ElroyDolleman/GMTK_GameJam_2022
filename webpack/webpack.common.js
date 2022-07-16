@@ -27,11 +27,15 @@ module.exports = {
 		new CopyPlugin({
 			patterns: [
 				{ 
-					from: path.resolve(__dirname, '../html/'), 
+					from: path.resolve(__dirname, '../html/'),
 					to: path.resolve(__dirname, '../build')
 				},
 				{
-					from: path.resolve(__dirname, '../assets/sprites/tilesets/'), 
+					from: path.resolve(__dirname, '../assets/sprites/tilesets/'),
+					to: path.resolve(__dirname, '../build/assets')
+				},
+				{
+					from: path.resolve(__dirname, '../assets/sprites/backgrounds/'),
 					to: path.resolve(__dirname, '../build/assets')
 				}
 			],

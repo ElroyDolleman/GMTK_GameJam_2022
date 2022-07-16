@@ -1,4 +1,5 @@
 import 'phaser';
+import { DiceScene } from './scenes/DiceScene';
 import { GameScene } from './scenes/GameScene';
 
 export const game = new Phaser.Game({
@@ -12,7 +13,7 @@ export const game = new Phaser.Game({
 	title: 'GMTK Game Jam 2022',
 	version: '0.0.1',
 	disableContextMenu: true,
-	scene: [ GameScene ],
+	scene: [ DiceScene, GameScene ],
 	// physics: {
 	// 	default: 'arcade',
 	// },

@@ -17,7 +17,7 @@ export class GameScene extends Phaser.Scene
 
 	public constructor()
 	{
-		super({ key: 'GameScene', active: true});
+		super({ key: 'GameScene', active: false});
 
 		this._levelLoader = new LevelLoader(this);
 

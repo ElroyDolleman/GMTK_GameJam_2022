@@ -211,7 +211,10 @@ export class LevelLoader
 			case 'player_spawn':
 				if (this.playerSpawnOnce) { return; }
 				this.playerSpawnOnce = true;
-				entities.push(new Player(this.scene, { x: entityData.x, y: entityData.y }));
+				let player = new Player(this.scene, { x: entityData.x, y: entityData.y });
+				entities.push(player);
+
+				this.scene.cameras.main.startFollow(player.sprite);
 				break;
 			}
 
