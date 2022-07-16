@@ -1,5 +1,7 @@
 import { CollisionResult } from '../collision/CollisionManager';
 import { ICollidable } from '../collision/ICollidable';
+import { IRectangle } from '../collision/IRectangle';
+import { IPoint } from '../utilities/IPoint';
 import { TimeUtility } from '../utilities/TimeUtility';
 
 export abstract class Entity implements ICollidable
@@ -34,9 +36,14 @@ export abstract class Entity implements ICollidable
 		return new Phaser.Math.Vector2(this.hitbox.x, this.hitbox.y);
 	}
 
-	public constructor(hitbox: Phaser.Geom.Rectangle)
+	public constructor(hitbox: IRectangle, position: IPoint)
 	{
-		this._hitbox = hitbox;
+		this._hitbox = new Phaser.Geom.Rectangle(
+			position.x + hitbox.left,
+			position.y + hitbox.top,
+			hitbox.right - hitbox.left,
+			hitbox.bottom - hitbox.top
+		);
 		this.speed = new Phaser.Math.Vector2();
 	}
 

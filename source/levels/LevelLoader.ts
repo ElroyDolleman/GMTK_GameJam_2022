@@ -1,7 +1,11 @@
+import { Entity } from '../entities/Entity';
+import { Player } from '../player/Player';
 import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 import { IPoint } from '../utilities/IPoint';
+import { Level } from './Level';
 import { EntityLayerData, ChunkData, TileLayerData } from './LevelData';
 import { Tile } from './tile';
+import { TileMap } from './TileMap';
 
 type LevelsJson = { [key: string]: ChunkData; };
 type ChunkType = 'deadend' | 'corridor' | 'up_corner' | 'down_corner';
@@ -47,7 +51,7 @@ export class LevelLoader
 		}
 	}
 
-	public generateLevel(chunksX: number, chunksY: number): void
+	public generateLevel(chunksX: number, chunksY: number): Level
 	{
 		if (this._jsonData === undefined)
 		{
@@ -60,14 +64,19 @@ export class LevelLoader
 			CHUNKS_COLUMNS * TILE_HEIGHT * chunksY
 		);
 
+		let tiles: Tile[] = [];
+
 		for (let x = 0; x < chunksX; x++)
 		{
 			for (let y = 0; y < chunksY; y++)
 			{
 				let info = this._getChunkInfoByPosition(x, y, chunksX - 1, chunksY - 1);
-				this.loadChunk(this._pickChunk(info.type), { x, y }, info.reverse);
+				tiles = tiles.concat(this.loadChunk(this._pickChunk(info.type), { x, y }, info.reverse));
 			}
 		}
+
+		let level = new Level(this.scene, new TileMap(tiles, CHUNK_ROWS * chunksX, CHUNKS_COLUMNS * chunksY, TILE_WIDTH, TILE_HEIGHT));
+		return level;
 	}
 
 	private _getChunkInfoByPosition(x: number, y: number, lastX: number, lastY: number): { type: ChunkType, reverse: boolean }
@@ -96,30 +105,34 @@ export class LevelLoader
 		return this._getChunkData(this._chunkNames[type][index]);
 	}
 
-	public loadChunk(chunkData: ChunkData, chunkPos: IPoint, reverse: boolean): void
+	public loadChunk(chunkData: ChunkData, chunkPos: IPoint, reverse: boolean): Tile[]
 	{
+		let tiles: Tile[] = [];
+
 		chunkData.layers.forEach(layer =>
 		{
 			switch(layer.name)
 			{
 			case 'tile_layer':
-				this._setupTileLayer(
+				tiles = tiles.concat(this._setupTileLayer(
 					layer as TileLayerData,
 					{
 						x: chunkPos.x * CHUNK_ROWS,
 						y: chunkPos.y * CHUNKS_COLUMNS
 					},
 					reverse
-				);
+				));
 				break;
 			case 'entity_layer':
 				this._setupEntityLayer(layer as EntityLayerData);
 				break;
 			}
 		});
+
+		return tiles;
 	}
 
-	private _setupTileLayer(layerData: TileLayerData, offset: IPoint, reverse: boolean): void
+	private _setupTileLayer(layerData: TileLayerData, offset: IPoint, reverse: boolean): Tile[]
 	{
 		const tiles: Tile[] = [];
 
@@ -154,14 +167,30 @@ export class LevelLoader
 				tiles.push(new Tile(sprite, cellX, cellY, cellX * TILE_WIDTH, cellY * TILE_HEIGHT));
 			}
 		}
+
+		return tiles;
 	}
 
-	private _setupEntityLayer(layerData: EntityLayerData): void
+	private _setupEntityLayer(layerData: EntityLayerData): Entity[]
 	{
+		let playerSpawnOnce = false;
+		let entities: Entity[] = [];
+
 		layerData.entities.forEach(entityData =>
 		{
 			console.log(entityData);
+
+			switch (entityData.name)
+			{
+			case 'player_spawn':
+				if (playerSpawnOnce) { break; }
+				playerSpawnOnce = true;
+				entities.push(new Player(this.scene, { x: entityData.x + TILE_WIDTH / 2, y: entityData.y + TILE_HEIGHT }));
+				break;
+			}
 		});
+
+		return entities;
 	}
 
 	private _makeSprite(tileId: number, posX: number, posY: number, tilesetName: string, flipX: boolean): Phaser.GameObjects.Sprite

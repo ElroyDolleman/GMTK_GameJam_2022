@@ -22,7 +22,7 @@ export class GameScene extends Phaser.Scene
 	{
 		this._levelLoader.preload();
 
-		this.load.atlas('test', 'assets/main-spritesheet.png', 'assets/main-spritesheet.json');
+		this.load.atlas('main-spritesheet', 'assets/main-spritesheet.png', 'assets/main-spritesheet.json');
 	}
 
 	public create(): void
