@@ -74,7 +74,7 @@ export class DiceScene extends Phaser.Scene
 
 	private async _goToGame(): Promise<void>
 	{
-		await TimeDelay.after(2000);
+		await TimeDelay.after(100); // 2000
 
 		this.scene.start('GameScene', { hello: 'world!' });
 	}

@@ -1,4 +1,5 @@
 import { ICollidable } from '../collision/ICollidable';
+import { CollectableDice } from '../dices/ColletableDice';
 import { Entity } from '../entities/Entity';
 import { Player } from '../player/Player';
 import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
@@ -148,7 +149,7 @@ export class LevelLoader
 				));
 				break;
 			case 'entity_layer':
-				let entitiesData = this._setupEntityLayer(layer as EntityLayerData);
+				let entitiesData = this._setupEntityLayer(layer as EntityLayerData, chunkPos, reverse);
 				entities = entitiesData.entities.concat();
 				collidables = entitiesData.collidables.concat();
 				break;
@@ -199,22 +200,37 @@ export class LevelLoader
 
 	// TODO: Remove later
 	private playerSpawnOnce: boolean = false;
-	private _setupEntityLayer(layerData: EntityLayerData): { entities: Entity[], collidables: ICollidable[] }
+	private _setupEntityLayer(layerData: EntityLayerData, chunkPos: IPoint, reverse: boolean): { entities: Entity[], collidables: ICollidable[] }
 	{
 		let entities: Entity[] = [];
 		let collidables: ICollidable[] = [];
 
 		layerData.entities.forEach(entityData =>
 		{
+			let x = entityData.x + chunkPos.x * CHUNK_ROWS * TILE_WIDTH;
+			let y = entityData.y + chunkPos.y * CHUNKS_COLUMNS * TILE_HEIGHT;
+
+			if (reverse)
+			{
+				let tileX = Math.floor(entityData.x / TILE_WIDTH);
+				let newTileX = CHUNK_ROWS - tileX;
+				x = (newTileX * TILE_WIDTH) + chunkPos.x * CHUNK_ROWS * TILE_WIDTH;
+			}
+
 			switch (entityData.name)
 			{
 			case 'player_spawn':
 				if (this.playerSpawnOnce) { return; }
 				this.playerSpawnOnce = true;
-				let player = new Player(this.scene, { x: entityData.x, y: entityData.y });
+				let player = new Player(this.scene, { x, y });
 				entities.push(player);
 
-				this.scene.cameras.main.startFollow(player.sprite);
+				this.scene.cameras.main.startFollow(player.sprite, true, undefined, undefined, undefined, 64);
+				break;
+			case 'dice_collectable':
+				let dice = new CollectableDice(this.scene, { x, y });
+				console.log({ x, y }, entityData.x, entityData.y);
+				entities.push(dice);
 				break;
 			}
 

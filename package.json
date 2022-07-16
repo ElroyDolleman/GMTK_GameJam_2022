@@ -7,8 +7,9 @@
     "build-dev": "webpack --config webpack/webpack.common.js",
     "export-levels": "node scripts/export_levels.js",
     "export-sprites": "node scripts/export_sprites.js",
+    "export-tilesets": "node scripts/export_tilesets.js",
     "eslint": "npx eslint source/** --fix",
-	"build-full": "npm run export-levels && npm run export-sprites && webpack --config webpack/webpack.common.js"
+	"build-full": "npm run export-levels && npm run export-sprites && npm run export-tilesets && webpack --config webpack/webpack.common.js"
   },
   "repository": {
     "type": "git",

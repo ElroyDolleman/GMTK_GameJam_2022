@@ -55,10 +55,10 @@ export class TileMap
 	}
 	public worldToTile(x: number, y: number): Tile
 	{
-		return this.getTile(this.tocellXumn(x), this.tocellY(y));
+		return this.getTile(this.tocellX(x), this.tocellY(y));
 	}
 
-	public tocellXumn(xPos: number): number
+	public tocellX(xPos: number): number
 	{
 		return Math.floor(xPos / this.tileWidth);
 	}
@@ -69,7 +69,7 @@ export class TileMap
 	public toGridLocation(x: number, y: number): Phaser.Geom.Point
 	{
 		return new Phaser.Geom.Point(
-			this.tocellXumn(x),
+			this.tocellX(x),
 			this.tocellY(y),
 		);
 	}

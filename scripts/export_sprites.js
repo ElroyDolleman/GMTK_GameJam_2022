@@ -135,7 +135,7 @@ console.log('\x1b[35m%s\x1b[0m', 'Start exporting aseprite files... ^o^');
 
 buildAsepriteFiles().then(() =>
 {
-	console.error('\x1b[33m%s\x1b[0m', 'Exporting aseprite files done! :D');
+	console.log('\x1b[33m%s\x1b[0m', 'Exporting aseprite files done! :D');
 }).catch(reason =>
 {
 	console.error(reason);
