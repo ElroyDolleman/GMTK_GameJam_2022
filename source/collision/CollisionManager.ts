@@ -1,5 +1,5 @@
 import { Level } from '../levels/Level';
-import { Tile, TileType } from '../levels/tile';
+import { Tile, TileTypes } from '../levels/tile';
 import { TileMap } from '../levels/TileMap';
 import { gameScene } from '../scenes/GameScene';
 import { ICollidable } from './ICollidable';
@@ -50,13 +50,13 @@ export class CollisionManager
 		let result = this._getDefualtResult(collidable);
 		result.tiles = this._level.map.getTilesFromRect(collidable.nextHitbox, 2);
 
-		if (!this._debugGraphics) { this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFFFF00, alpha: 0.8 } }); }
-		this._debugGraphics.clear();
+		// if (!this._debugGraphics) { this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFFFF00, alpha: 0.8 } }); }
+		// this._debugGraphics.clear();
 
 		collidable.moveX();
 		for (let i = 0; i < result.tiles.length; i++)
 		{
-			this._debugGraphics.fillRectShape(result.tiles[i].hitbox);
+			// this._debugGraphics.fillRectShape(result.tiles[i].hitbox);
 
 			if (!this._overlapsNonEmptyTile(result.tiles[i], collidable))
 			{
@@ -102,7 +102,6 @@ export class CollisionManager
 		}
 		else if (collidable.speed.x < 0)
 		{
-			console.log(collidable.hitbox.x, tile.hitbox.right);
 			collidable.hitbox.x = tile.hitbox.right;
 			return 'onLeft';
 		}
@@ -126,6 +125,6 @@ export class CollisionManager
 
 	private _overlapsNonEmptyTile(tile: Tile, collidable: ICollidable): boolean
 	{
-		return tile.tileType !== TileType.Empty && Phaser.Geom.Rectangle.Overlaps(tile.hitbox, collidable.hitbox);
+		return tile.tileType !== TileTypes.Empty && Phaser.Geom.Rectangle.Overlaps(tile.hitbox, collidable.hitbox);
 	}
 }

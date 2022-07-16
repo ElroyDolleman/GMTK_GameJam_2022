@@ -1,13 +1,16 @@
 import { gameScene } from '../scenes/GameScene';
 import { TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 
-export enum TileType {
+export enum TileTypes {
 	Empty,
 	Solid
 }
 
 export class Tile
 {
+	public get isSolid(): boolean { return this.tileType === TileTypes.Solid; }
+	public get canStandOn(): boolean { return this.isSolid /**|| this.isSemisolid*/; }
+
 	public readonly cellX: number;
 	public readonly cellY: number;
 
@@ -17,9 +20,9 @@ export class Tile
 	public hitbox: Phaser.Geom.Rectangle;
 	private _debugGraphics: any;
 
-	public tileType: TileType = TileType.Empty;
+	public tileType: TileTypes = TileTypes.Empty;
 
-	public constructor(sprite: Phaser.GameObjects.Sprite | undefined, cellX: number, cellY: number, posX: number, posY: number, tileType?: TileType)
+	public constructor(sprite: Phaser.GameObjects.Sprite | undefined, cellX: number, cellY: number, posX: number, posY: number, tileType?: TileTypes)
 	{
 		this.position = new Phaser.Geom.Point(posX, posY);
 		this.sprite = sprite;
@@ -36,7 +39,7 @@ export class Tile
 
 			if (!tileType)
 			{
-				this.tileType = TileType.Solid;
+				this.tileType = TileTypes.Solid;
 			}
 		}
 	}

@@ -35,10 +35,10 @@ export class GameScene extends Phaser.Scene
 
 	public create(): void
 	{
-		this.camKeyLeft = this.input.keyboard.addKey('left');
-		this.camKeyRight = this.input.keyboard.addKey('right');
-		this.camKeyUp = this.input.keyboard.addKey('up');
-		this.camKeyDown = this.input.keyboard.addKey('down');
+		this.camKeyLeft = this.input.keyboard.addKey('A');
+		this.camKeyRight = this.input.keyboard.addKey('D');
+		this.camKeyUp = this.input.keyboard.addKey('W');
+		this.camKeyDown = this.input.keyboard.addKey('S');
 
 		this.currentLevel = this._levelLoader.generateLevel(3, 3);
 

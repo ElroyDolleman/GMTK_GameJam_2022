@@ -1,4 +1,4 @@
-class CollisionUtility
+export class CollisionUtility
 {
 	private constructor() {}
 
