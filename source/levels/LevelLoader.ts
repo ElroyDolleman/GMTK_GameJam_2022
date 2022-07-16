@@ -1,15 +1,17 @@
+import { ICollidable } from '../collision/ICollidable';
 import { Entity } from '../entities/Entity';
 import { Player } from '../player/Player';
 import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 import { IPoint } from '../utilities/IPoint';
 import { Level } from './Level';
-import { EntityLayerData, ChunkData, TileLayerData } from './LevelData';
+import { EntityLayerData, ChunkJsonData, TileLayerData } from './LevelData';
 import { Tile } from './tile';
 import { TileMap } from './TileMap';
 
-type LevelsJson = { [key: string]: ChunkData; };
+type LevelsJson = { [key: string]: ChunkJsonData; };
 type ChunkType = 'deadend' | 'corridor' | 'up_corner' | 'down_corner';
 type ChunkNames = { [key in ChunkType]: string[]; };
+type ChunkData = { tiles: Tile[], entities: Entity[], collidables: ICollidable[] };
 
 export class LevelLoader
 {
@@ -46,7 +48,6 @@ export class LevelLoader
 		}
 		else
 		{
-			console.log(this.scene.cache.json.entries);
 			throw new Error('Failed to get levels json from cache');
 		}
 	}
@@ -65,17 +66,38 @@ export class LevelLoader
 		);
 
 		let tiles: Tile[] = [];
+		let entities: Entity[] = [];
+		let collidables: ICollidable[] = [];
 
 		for (let x = 0; x < chunksX; x++)
 		{
 			for (let y = 0; y < chunksY; y++)
 			{
 				let info = this._getChunkInfoByPosition(x, y, chunksX - 1, chunksY - 1);
-				tiles = tiles.concat(this.loadChunk(this._pickChunk(info.type), { x, y }, info.reverse));
+				let chunkData = this.loadChunk(this._pickChunk(info.type), { x, y }, info.reverse);
+
+				tiles = tiles.concat(chunkData.tiles);
+				entities = entities.concat(chunkData.entities);
+				collidables = collidables.concat(chunkData.collidables);
 			}
 		}
 
-		let level = new Level(this.scene, new TileMap(tiles, CHUNK_ROWS * chunksX, CHUNKS_COLUMNS * chunksY, TILE_WIDTH, TILE_HEIGHT));
+		// SORT
+		tiles.sort((tile1, tile2) =>
+		{
+			if (tile1.cellY === tile2.cellY)
+			{
+				if (tile1.cellX > tile2.cellX) { return 1; }
+				else { return -1; }
+			}
+			if (tile1.cellY > tile2.cellY)
+			{
+				return 1;
+			}
+			return -1;
+		});
+
+		let level = new Level(this.scene, new TileMap(tiles, CHUNK_ROWS * chunksX, CHUNKS_COLUMNS * chunksY, TILE_WIDTH, TILE_HEIGHT), entities, collidables);
 		return level;
 	}
 
@@ -98,16 +120,18 @@ export class LevelLoader
 		return { type: 'corridor', reverse: false }
 	}
 
-	private _pickChunk(type: ChunkType): ChunkData
+	private _pickChunk(type: ChunkType): ChunkJsonData
 	{
 		let index = Phaser.Math.Between(0, this._chunkNames[type].length - 1);
 
 		return this._getChunkData(this._chunkNames[type][index]);
 	}
 
-	public loadChunk(chunkData: ChunkData, chunkPos: IPoint, reverse: boolean): Tile[]
+	public loadChunk(chunkData: ChunkJsonData, chunkPos: IPoint, reverse: boolean): ChunkData
 	{
 		let tiles: Tile[] = [];
+		let entities: Entity[] = [];
+		let collidables: ICollidable[] = [];
 
 		chunkData.layers.forEach(layer =>
 		{
@@ -124,12 +148,14 @@ export class LevelLoader
 				));
 				break;
 			case 'entity_layer':
-				this._setupEntityLayer(layer as EntityLayerData);
+				let entitiesData = this._setupEntityLayer(layer as EntityLayerData);
+				entities = entitiesData.entities.concat();
+				collidables = entitiesData.collidables.concat();
 				break;
 			}
 		});
 
-		return tiles;
+		return { tiles, entities, collidables };
 	}
 
 	private _setupTileLayer(layerData: TileLayerData, offset: IPoint, reverse: boolean): Tile[]
@@ -171,26 +197,31 @@ export class LevelLoader
 		return tiles;
 	}
 
-	private _setupEntityLayer(layerData: EntityLayerData): Entity[]
+	// TODO: Remove later
+	private playerSpawnOnce: boolean = false;
+	private _setupEntityLayer(layerData: EntityLayerData): { entities: Entity[], collidables: ICollidable[] }
 	{
-		let playerSpawnOnce = false;
 		let entities: Entity[] = [];
+		let collidables: ICollidable[] = [];
 
 		layerData.entities.forEach(entityData =>
 		{
-			console.log(entityData);
-
 			switch (entityData.name)
 			{
 			case 'player_spawn':
-				if (playerSpawnOnce) { break; }
-				playerSpawnOnce = true;
-				entities.push(new Player(this.scene, { x: entityData.x + TILE_WIDTH / 2, y: entityData.y + TILE_HEIGHT }));
+				if (this.playerSpawnOnce) { return; }
+				this.playerSpawnOnce = true;
+				entities.push(new Player(this.scene, { x: entityData.x, y: entityData.y }));
 				break;
+			}
+
+			if (entityData.values?.collidable)
+			{
+				collidables.push(entities[entities.length - 1]);
 			}
 		});
 
-		return entities;
+		return { entities, collidables };
 	}
 
 	private _makeSprite(tileId: number, posX: number, posY: number, tilesetName: string, flipX: boolean): Phaser.GameObjects.Sprite
@@ -201,7 +232,7 @@ export class LevelLoader
 		return sprite;
 	}
 
-	private _getChunkData(name: string): ChunkData
+	private _getChunkData(name: string): ChunkJsonData
 	{
 		return this._jsonData[name];
 	}

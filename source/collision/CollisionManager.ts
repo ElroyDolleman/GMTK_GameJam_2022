@@ -1,6 +1,7 @@
 import { Level } from '../levels/Level';
-import { Tile } from '../levels/tile';
+import { Tile, TileType } from '../levels/tile';
 import { TileMap } from '../levels/TileMap';
+import { gameScene } from '../scenes/GameScene';
 import { ICollidable } from './ICollidable';
 import { IRectangle } from './IRectangle';
 
@@ -18,6 +19,7 @@ export type CollisionResult = {
 export class CollisionManager
 {
 	private readonly _level: Level;
+	private _debugGraphics: Phaser.GameObjects.Graphics;
 
 	public constructor(level: Level)
 	{
@@ -48,9 +50,19 @@ export class CollisionManager
 		let result = this._getDefualtResult(collidable);
 		result.tiles = this._level.map.getTilesFromRect(collidable.nextHitbox, 2);
 
+		if (!this._debugGraphics) { this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFFFF00, alpha: 0.8 } }); }
+		this._debugGraphics.clear();
+
 		collidable.moveX();
 		for (let i = 0; i < result.tiles.length; i++)
 		{
+			this._debugGraphics.fillRectShape(result.tiles[i].hitbox);
+
+			if (!this._overlapsNonEmptyTile(result.tiles[i], collidable))
+			{
+				continue;
+			}
+
 			let collideResult = this._solveHorizontalCollision(result.tiles[i], collidable);
 
 			switch(collideResult)
@@ -63,6 +75,11 @@ export class CollisionManager
 		collidable.moveY();
 		for (let i = 0; i < result.tiles.length; i++)
 		{
+			if (!this._overlapsNonEmptyTile(result.tiles[i], collidable))
+			{
+				continue;
+			}
+
 			let collideResult = this._solveVerticalCollision(result.tiles[i], collidable);
 
 			switch(collideResult)
@@ -85,6 +102,7 @@ export class CollisionManager
 		}
 		else if (collidable.speed.x < 0)
 		{
+			console.log(collidable.hitbox.x, tile.hitbox.right);
 			collidable.hitbox.x = tile.hitbox.right;
 			return 'onLeft';
 		}
@@ -104,5 +122,10 @@ export class CollisionManager
 			return 'onTop';
 		}
 		return null;
+	}
+
+	private _overlapsNonEmptyTile(tile: Tile, collidable: ICollidable): boolean
+	{
+		return tile.tileType !== TileType.Empty && Phaser.Geom.Rectangle.Overlaps(tile.hitbox, collidable.hitbox);
 	}
 }

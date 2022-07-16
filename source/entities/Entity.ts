@@ -18,8 +18,8 @@ export abstract class Entity implements ICollidable
 	public get nextHitbox(): Phaser.Geom.Rectangle
 	{
 		return new Phaser.Geom.Rectangle(
-			this.x + this.speed.x * TimeUtility.elapsedMS,
-			this.y + this.speed.y * TimeUtility.elapsedMS,
+			this.x + this.speed.x * TimeUtility.elapsedSeconds,
+			this.y + this.speed.y * TimeUtility.elapsedSeconds,
 			this.hitbox.width,
 			this.hitbox.height
 		);
@@ -30,6 +30,8 @@ export abstract class Entity implements ICollidable
 
 	public get y(): number { return this._hitbox.y; }
 	public set y(y: number) { this._hitbox.y = y; }
+
+	protected _debugGraphics: Phaser.GameObjects.Graphics;
 
 	public get position(): Phaser.Math.Vector2
 	{
@@ -52,11 +54,11 @@ export abstract class Entity implements ICollidable
 
 	public moveX(): void
 	{
-		this._hitbox.x += this.speed.x * TimeUtility.elapsedMS;
+		this._hitbox.x += this.speed.x * TimeUtility.elapsedSeconds;
 	}
 	public moveY(): void
 	{
-		this._hitbox.y += this.speed.y * TimeUtility.elapsedMS;
+		this._hitbox.y += this.speed.y * TimeUtility.elapsedSeconds;
 	}
 
 	public abstract destroy(): void;

@@ -6,7 +6,9 @@ export type EntityData = {
 	name: string;
 	x: number;
 	y: number;
-	values: any;
+	values?: {
+		collidable?: boolean;
+	};
 }
 
 export interface TileLayerData extends DefaultLayerData {
@@ -18,6 +20,6 @@ export interface EntityLayerData extends DefaultLayerData {
 	entities: EntityData[];
 }
 
-export type ChunkData = {
+export type ChunkJsonData = {
 	layers: (TileLayerData | EntityLayerData)[];
 }

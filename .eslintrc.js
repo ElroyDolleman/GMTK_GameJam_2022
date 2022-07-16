@@ -31,6 +31,8 @@ module.exports = {
 		"indent": ["error", "tab"],
 		"brace-style": ["error", "allman", { "allowSingleLine": true }],
 		"no-trailing-spaces": "error",
+		"no-case-declarations": "off",
+		"eqeqeq": "error",
 
 		// TYPESCRIPT
 		"@typescript-eslint/no-unused-vars": "off",

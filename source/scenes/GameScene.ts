@@ -1,10 +1,14 @@
 
-import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 import { LevelLoader } from '../levels/LevelLoader';
+import { Level } from '../levels/Level';
+
+export let gameScene: GameScene;
 
 export class GameScene extends Phaser.Scene
 {
 	private readonly _levelLoader: LevelLoader;
+
+	private currentLevel: Level;
 
 	private camKeyLeft: Phaser.Input.Keyboard.Key;
 	private camKeyRight: Phaser.Input.Keyboard.Key;
@@ -16,6 +20,10 @@ export class GameScene extends Phaser.Scene
 		super({ key: 'GameScene', active: true});
 
 		this._levelLoader = new LevelLoader(this);
+
+		// TODO: Fix later
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		gameScene = this;
 	}
 
 	public preload(): void
@@ -32,7 +40,7 @@ export class GameScene extends Phaser.Scene
 		this.camKeyUp = this.input.keyboard.addKey('up');
 		this.camKeyDown = this.input.keyboard.addKey('down');
 
-		this._levelLoader.generateLevel(3, 3);
+		this.currentLevel = this._levelLoader.generateLevel(3, 3);
 
 		// const atlasTexture = this.textures.get('test');
 		// const frames = atlasTexture.getFrameNames();
@@ -64,5 +72,7 @@ export class GameScene extends Phaser.Scene
 		{
 			this.cameras.main.setScroll(this.cameras.main.scrollX, this.cameras.main.scrollY + 4);
 		}
+
+		this.currentLevel.update();
 	}
 }

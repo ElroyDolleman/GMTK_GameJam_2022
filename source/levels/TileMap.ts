@@ -1,3 +1,5 @@
+import { IRectangle } from '../collision/IRectangle';
+import { IPoint } from '../utilities/IPoint';
 import { Tile } from './tile';
 
 export class TileMap
@@ -22,21 +24,16 @@ export class TileMap
 	{
 		return this._tiles[cellX + (cellY * this.gridCellsX)];
 	}
-	public getTilesFromRect(rect: Phaser.Geom.Rectangle, margin: number = 0): Tile[]
+
+	public getTilesFromRect(rect: IRectangle, margin: number = 0): Tile[]
 	{
 		return this.getTilesFromTo(
-			this.toGridLocation(rect.x - margin, rect.y - margin),
+			this.toGridLocation(rect.left - margin, rect.top - margin),
 			this.toGridLocation(rect.right + margin, rect.bottom + margin)
 		);
 	}
-	public getTilesFromCircle(circle: Phaser.Geom.Circle, margin: number = 0): Tile[]
-	{
-		return this.getTilesFromTo(
-			this.toGridLocation(circle.left - margin, circle.top - margin),
-			this.toGridLocation(circle.right + margin, circle.bottom + margin)
-		);
-	}
-	public getTilesFromTo(from: Phaser.Geom.Point, to: Phaser.Geom.Point): Tile[]
+
+	public getTilesFromTo(from: IPoint, to: IPoint): Tile[]
 	{
 		const tiles = [];
 		for (let x = from.x; x <= to.x; x++)

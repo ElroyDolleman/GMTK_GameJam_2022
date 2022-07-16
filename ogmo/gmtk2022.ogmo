@@ -70,7 +70,9 @@
       "nodeDisplay": 0,
       "nodeGhost": true,
       "tags": [],
-      "values": []
+      "values": [
+        {"name": "collidable", "definition": "Boolean", "display": 0, "defaults": true}
+      ]
     }
   ],
   "tilesets": [

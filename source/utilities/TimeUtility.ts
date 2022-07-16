@@ -9,7 +9,8 @@ export class TimeUtility
 	private constructor()
 	{ }
 
-	public static readonly elapsedMS: number = (1 / 60) * 1000;
+	public static readonly elapsedSeconds: number = (1 / 60);
+	public static get elapsedMS(): number { return this.elapsedSeconds * 1000; }
 
 	public static getTimeDifferenceMSMM(firstDate: Date, secondDate: Date): MSMM
 	{

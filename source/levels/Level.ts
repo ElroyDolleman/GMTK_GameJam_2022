@@ -9,13 +9,15 @@ export class Level
 	public readonly map: TileMap;
 	public readonly collisionManager: CollisionManager;
 
-	public readonly entities: Entity[] = [];
-	public readonly collidables: ICollidable[] = [];
+	public readonly entities: Entity[];
+	public readonly collidables: ICollidable[];
 
-	public constructor(scene: Phaser.Scene, map: TileMap)
+	public constructor(scene: Phaser.Scene, map: TileMap, entities: Entity[] = [], collidables: ICollidable[] = [])
 	{
 		this.map = map;
 		this.scene = scene;
+		this.entities = entities;
+		this.collidables = collidables;
 		this.collisionManager = new CollisionManager(this);
 	}
 

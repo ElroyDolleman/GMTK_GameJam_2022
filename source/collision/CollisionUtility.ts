@@ -4,7 +4,7 @@ class CollisionUtility
 
 	public static hitboxVerticallyAligned(topHitbox: Phaser.Geom.Rectangle, bottomHitbox: Phaser.Geom.Rectangle, margin: number = 0): boolean
 	{
-		if (bottomHitbox.top == topHitbox.bottom)
+		if (bottomHitbox.top === topHitbox.bottom)
 		{
 			return topHitbox.right > bottomHitbox.left && topHitbox.left < bottomHitbox.right;
 		}
@@ -13,7 +13,7 @@ class CollisionUtility
 
 	public static hitboxHorizontallyAligned(leftHitbox: Phaser.Geom.Rectangle, rightHitbox: Phaser.Geom.Rectangle, margin: number = 0): boolean
 	{
-		if (leftHitbox.right == rightHitbox.left)
+		if (leftHitbox.right === rightHitbox.left)
 		{
 			return leftHitbox.bottom > rightHitbox.top && leftHitbox.top < rightHitbox.bottom;
 		}

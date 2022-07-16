@@ -69,7 +69,7 @@ export class SpriteAnimator
 	{
 		this._currentSquish = {
 			timer: duration,
-			reverseTime: reverseTime == undefined ? duration / 2 : reverseTime,
+			reverseTime: reverseTime === undefined ? duration / 2 : reverseTime,
 			startTime: duration,
 			scaleX: scaleX,
 			scaleY: scaleY
@@ -77,7 +77,7 @@ export class SpriteAnimator
 	}
 	protected _updateSquish(): void
 	{
-		this._currentSquish.timer = Math.max(this._currentSquish.timer - TimeUtility.elapsedMS, 0);
+		this._currentSquish.timer = Math.max(this._currentSquish.timer - TimeUtility.elapsedSeconds, 0);
 		let timeToReverse = this._currentSquish.startTime - this._currentSquish.reverseTime;
 
 		if (this._currentSquish.timer > timeToReverse)
