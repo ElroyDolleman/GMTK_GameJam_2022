@@ -3,7 +3,8 @@ import { TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 
 export enum TileTypes {
 	Empty,
-	Solid
+	Solid,
+	SemiSolid
 }
 
 export class Tile
@@ -22,7 +23,7 @@ export class Tile
 
 	public tileType: TileTypes = TileTypes.Empty;
 
-	public constructor(sprite: Phaser.GameObjects.Sprite | undefined, cellX: number, cellY: number, posX: number, posY: number, tileType?: TileTypes)
+	public constructor(sprite: Phaser.GameObjects.Sprite | undefined, cellX: number, cellY: number, posX: number, posY: number, tileTypeString?: string)
 	{
 		this.position = new Phaser.Geom.Point(posX, posY);
 		this.sprite = sprite;
@@ -32,16 +33,17 @@ export class Tile
 
 		this.hitbox = new Phaser.Geom.Rectangle(posX, posY, TILE_WIDTH, TILE_HEIGHT);
 
-		if (this.sprite)
+		let tileType = TileTypes[(tileTypeString as keyof typeof TileTypes)];
+		if (tileType !== undefined)
 		{
-			// this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFF0000, alpha: 0.4 } });
-			// this._debugGraphics.fillRectShape(this.hitbox);
-
-			if (!tileType)
-			{
-				this.tileType = TileTypes.Solid;
-			}
+			this.tileType = tileType;
 		}
+
+		// if (this.isSolid)
+		// {
+		// 	// this._debugGraphics = gameScene.add.graphics({ fillStyle: { color: 0xFF0000, alpha: 0.4 } });
+		// 	// this._debugGraphics.fillRectShape(this.hitbox);
+		// }
 	}
 
 	public destroy(): void

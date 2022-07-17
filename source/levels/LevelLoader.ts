@@ -1,13 +1,14 @@
+import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
+import { EntityLayerData, ChunkJsonData, TileLayerData } from './LevelData';
 import { ICollidable } from '../collision/ICollidable';
 import { CollectableDice } from '../dices/ColletableDice';
 import { Entity } from '../entities/Entity';
 import { Player } from '../player/Player';
-import { CHUNKS_COLUMNS, CHUNK_ROWS, TILE_HEIGHT, TILE_WIDTH } from '../utilities/GameConfig';
 import { IPoint } from '../utilities/IPoint';
 import { Level } from './Level';
-import { EntityLayerData, ChunkJsonData, TileLayerData } from './LevelData';
 import { Tile } from './tile';
 import { TileMap } from './TileMap';
+import { TilesetData } from './TilesetData';
 
 type LevelsJson = { [key: string]: ChunkJsonData; };
 type ChunkType = 'deadend' | 'corridor' | 'up_corner' | 'down_corner';
@@ -19,6 +20,7 @@ export class LevelLoader
 	public readonly scene: Phaser.Scene;
 
 	private _jsonData: LevelsJson;
+	private _tilesetsData: { [key: string]: TilesetData; } = {};
 
 	private _chunkNames: ChunkNames = {} as ChunkNames;
 
@@ -30,6 +32,7 @@ export class LevelLoader
 	public preload(): void
 	{
 		this.scene.load.json('levels', 'assets/levels.json');
+		this.scene.load.json('main_tileset_data', 'assets/default_tileset.json');
 		this.scene.load.spritesheet('main_tileset', 'assets/default_tileset.png', { frameWidth: TILE_WIDTH, frameHeight: TILE_HEIGHT });
 	}
 
@@ -51,6 +54,21 @@ export class LevelLoader
 		{
 			throw new Error('Failed to get levels json from cache');
 		}
+
+		// TODO: Support others
+		if (this.scene.cache.json.has('main_tileset_data'))
+		{
+			this._tilesetsData['main_tileset_data'] = this.scene.cache.json.get('main_tileset_data');
+		}
+		else
+		{
+			throw new Error('Failed to get main_tileset_data json from cache');
+		}
+	}
+
+	public getTilesetData(tilesetName: string): TilesetData
+	{
+		return this._tilesetsData[tilesetName + '_data'];
 	}
 
 	public generateLevel(chunksX: number, chunksY: number): Level
@@ -162,6 +180,7 @@ export class LevelLoader
 	private _setupTileLayer(layerData: TileLayerData, offset: IPoint, reverse: boolean): Tile[]
 	{
 		const tiles: Tile[] = [];
+		const tilesetData = this.getTilesetData('main_tileset');
 
 		for (let y = 0; y < layerData.data2D.length; y++)
 		{
@@ -180,6 +199,9 @@ export class LevelLoader
 				const cellX = offset.x + x;
 				const cellY = offset.y + y;
 
+				const tileData = tilesetData.tiles.find(t => { return t.id === tileNum; });
+				const prop = tileData?.properties?.find(prop => { return prop.name === 'type'; });
+
 				if (tileNum >= 0)
 				{
 					sprite = this._makeSprite(
@@ -191,7 +213,7 @@ export class LevelLoader
 					);
 				}
 
-				tiles.push(new Tile(sprite, cellX, cellY, cellX * TILE_WIDTH, cellY * TILE_HEIGHT));
+				tiles.push(new Tile(sprite, cellX, cellY, cellX * TILE_WIDTH, cellY * TILE_HEIGHT, prop?.value as string));
 			}
 		}
 

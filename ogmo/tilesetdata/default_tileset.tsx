@@ -3,7 +3,7 @@
  <editorsettings>
   <export target="tilesetdata/default_tileset.json" format="json"/>
  </editorsettings>
- <image source="../assets/sprites/tilesets/default_tileset.png" width="256" height="256"/>
+ <image source="../../assets/sprites/tilesets/default_tileset.png" width="256" height="256"/>
  <tile id="0">
   <properties>
    <property name="type" value="Solid"/>
